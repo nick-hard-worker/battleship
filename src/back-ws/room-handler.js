@@ -12,14 +12,15 @@ export function createRoom(ws, data, id) {
         }
       ]
     });
-  console.log('Received createRoom message:', data);
+  // console.log('Received createRoom message:', data);
+  // roomRepository.getAll().filter(room => room)
 
   const response = {
     type: 'update_room',
-    data: JSON.stringify({
+    data: JSON.stringify([{
       roomId: createdRoom.id,
       roomUsers: createdRoom.roomUsers
-    }),
+    }]),
     id,
   };
 
