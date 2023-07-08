@@ -1,9 +1,16 @@
 import { randomUUID } from 'node:crypto';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 import { handleRegistration } from './reg-handler.js';
 import { createRoom } from './room-handler.js';
 
-const messageHandlers = {
+export interface ExtendedWebSocket extends WebSocket {
+  id: string;
+}
+
+type IInputTypeMsg = 'reg' | 'create_room' | 'add_user_to_room' | 'add_ships' | 'attack' | 'randomAttack';
+type MessageHandler = (ws: ExtendedWebSocket, data: any, id: number) => void;
+
+const messageHandlers: Record<IInputTypeMsg, MessageHandler> = {
   reg: handleRegistration,
   create_room: createRoom,
   add_user_to_room: () => { },
@@ -12,25 +19,25 @@ const messageHandlers = {
   randomAttack: () => { },
 };
 
-export const startWebSocketServer = (port) => {
+export const startWebSocketServer = (port: number) => {
   const wsServer = new WebSocketServer({ port });
   console.log(`WebSocket server started on the ${port}`);
 
-  wsServer.on('connection', ws => {
+  wsServer.on('connection', (ws: ExtendedWebSocket) => {
     // console.log('Clients: ', wsServer.clients.size);
     ws.id = randomUUID();
     ws.on('error', console.error);
 
     ws.on('message', function message(msg) {
       try {
-        const parsedMessage = JSON.parse(msg);
+        const parsedMessage = JSON.parse(msg.toString());
         console.log(parsedMessage);
         let { type, data, id } = parsedMessage;
 
         if (data.length > 0) data = JSON.parse(data); // feature on the frontend side
 
-        if (messageHandlers[type] && id === 0) {
-          messageHandlers[type](ws, data);
+        if (isMessageHandler(type)) {
+          messageHandlers[type](ws, data, id);
         } else {
           console.log(`No handler found for message type: ${type}`);
         }
@@ -40,3 +47,7 @@ export const startWebSocketServer = (port) => {
     });
   });
 };
+
+function isMessageHandler(type: any): type is IInputTypeMsg {
+  return type in messageHandlers;
+}

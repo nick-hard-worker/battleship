@@ -1,13 +1,15 @@
 import { userRepository } from './db/db.js';
+import { ExtendedWebSocket } from './websocket-server.js'
+import { IUser } from './db/db.js';
 
 // type "reg" handler:
-export function handleRegistration(ws, data, id) {
+export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number) {
   console.log('Received reg message:', data, ws.id);
-  let connectedUser;
-  connectedUser = userRepository.getByName(data.name);
-  if (connectedUser) {
+  let connectedUser: IUser;
+  const foundUser = userRepository.getByName(data.name);
+  if (foundUser) {
     // check password
-    connectedUser = userRepository.update(connectedUser.id, { ...connectedUser, wsId: ws.id });
+    connectedUser = userRepository.update(foundUser.id, { ...foundUser, wsId: ws.id }) as IUser;
   }
   else connectedUser = userRepository.create({ ...data, wsId: ws.id });
   console.log(connectedUser);

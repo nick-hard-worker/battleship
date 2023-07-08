@@ -7,5 +7,5 @@
     "src/**/*.spec.*",
     "src/**/*.test.*"
   ],
-  "exec": "ts-node-esm --files ./index.js"
+  "exec": "ts-node-esm --files ./index.ts"
 }
