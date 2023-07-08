@@ -1,6 +1,5 @@
-import { userRepository } from './db/db.js';
+import { userRepository, IUser } from './db/db.js';
 import { ExtendedWebSocket } from './websocket-server.js'
-import { IUser } from './db/db.js';
 
 // type "reg" handler:
 export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number) {
