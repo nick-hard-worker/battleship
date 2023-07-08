@@ -48,17 +48,23 @@ export interface IGame {
 }
 
 // class GameRepository extends InMemoryRepository<IGame, Omit<IGame, 'id'>> {
-//   gameId: number
-//   players: IPlayer[]
-
-//   create(entity: Omit<IGame, "id">): IGame {
-//     super.create()
-//     this.gameId = id1;
-//     this.players = [
-//       { userId: id1, ships: [] },
-//       { userId: id2, ships: [] }
-//     ];
+//   create(id1: number, id2: number) {
+//     const game: Omit<IGame, 'id'> = {
+//       gameId: id1,
+//       players: [
+//         {
+//           userId: id1,
+//           ships: []
+//         },
+//         {
+//           userId: id2,
+//           ships: []
+//         }
+//       ]
+//     }
+//     super.create(game)
 //   }
 // }
 
+// export const gameRepository = new GameRepository();
 export const gameRepository = new InMemoryRepository<IGame, Omit<IGame, 'id'>>();

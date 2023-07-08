@@ -51,7 +51,7 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
       ]
     });
 
-    const response = {
+    const responseToCurrent = {
       type: "create_game",
       data: JSON.stringify({
         idGame: firstUser.id,
@@ -59,7 +59,17 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
       }),
       id: 0,
     }
+    ws.send(JSON.stringify(responseToCurrent))
 
-    sendMsgToMultiple([firstUser.wsId, currentUser.wsId,], JSON.stringify(response));
+    const responseToFirst = {
+      type: "create_game",
+      data: JSON.stringify({
+        idGame: firstUser.id,
+        idPlayer: firstUser.id
+      }),
+      id: 0,
+    }
+
+    sendMsgToMultiple([firstUser.wsId], JSON.stringify(responseToFirst));
   }
 }
