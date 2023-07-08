@@ -26,16 +26,14 @@ export const startWebSocketServer = (port: number) => {
   console.log(`WebSocket server started on the ${port}`);
 
   wsServer.on('connection', (ws: ExtendedWebSocket) => {
-    // console.log('Clients: ', wsServer.clients.size);
     ws.id = randomUUID();
     ws.on('error', console.error);
 
     ws.on('message', function message(msg) {
       try {
         const parsedMessage = JSON.parse(msg.toString());
-        console.log(parsedMessage);
         let { type, data, id } = parsedMessage;
-
+        console.log(parsedMessage);
         if (data.length > 0) data = JSON.parse(data); // feature on the frontend side
 
         if (isMessageHandler(type)) {

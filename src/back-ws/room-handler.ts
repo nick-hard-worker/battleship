@@ -1,4 +1,4 @@
-import { roomRepository, userRepository, IUser } from './db/db.js';
+import { roomRepository, userRepository, IUser, gameRepository } from './db/db.js';
 import { ExtendedWebSocket, sendMsgToMultiple } from './websocket-server.js'
 // 2 actions for room: createRoom, addUserToRoom:
 
@@ -37,6 +37,19 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
     const firstUser = userRepository.getById(roomForGame.roomUsers[0].index) as IUser;
 
     roomRepository.update(roomForGame);
+    gameRepository.create({
+      gameId: firstUser.id,
+      players: [
+        {
+          userId: firstUser.id,
+          ships: []
+        },
+        {
+          userId: currentUser.id,
+          ships: []
+        }
+      ]
+    });
 
     const response = {
       type: "create_game",
