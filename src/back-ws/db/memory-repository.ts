@@ -26,10 +26,10 @@ export class InMemoryRepository<T1 extends Entity, T2 extends NoIdEntity> {
     return entityWithId;
   }
 
-  update(id: number, updatedEntity: T1) {
-    const index = this.entities.findIndex(entity => entity.id === id);
+  update(updatedEntity: T1) {
+    const index = this.entities.findIndex(entity => entity.id === updatedEntity.id);
     if (index !== -1) {
-      this.entities[index] = { ...updatedEntity, id };
+      this.entities[index] = updatedEntity;
       return updatedEntity;
     }
   }

@@ -23,6 +23,10 @@ class UserRepository extends InMemoryRepository<IUser, Omit<IUser, 'id'>> {
   getByName(name: string) {
     return this.entities.find(user => user.name === name);
   }
+
+  getByWsId(wsId: string) {
+    return this.entities.find(user => user.wsId === wsId);
+  }
 }
 
 export const userRepository = new UserRepository();

@@ -9,7 +9,7 @@ export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number)
   const foundUser = userRepository.getByName(data.name);
   if (foundUser) {
     // check password
-    connectedUser = userRepository.update(foundUser.id, { ...foundUser, wsId: ws.id }) as IUser;
+    connectedUser = userRepository.update({ ...foundUser, wsId: ws.id }) as IUser;
   }
   else connectedUser = userRepository.create({ ...data, wsId: ws.id });
   console.log(connectedUser);

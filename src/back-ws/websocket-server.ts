@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { WebSocketServer, WebSocket } from 'ws';
 import { handleRegistration } from './reg-handler.js';
-import { createRoom } from './room-handler.js';
+import { createRoom, addUserToRoom } from './room-handler.js';
+import { wsServer } from '../../index.js'
 
 export interface ExtendedWebSocket extends WebSocket {
   id: string;
@@ -13,7 +14,7 @@ type MessageHandler = (ws: ExtendedWebSocket, data: any, id: number) => void;
 const messageHandlers: Record<IInputTypeMsg, MessageHandler> = {
   reg: handleRegistration,
   create_room: createRoom,
-  add_user_to_room: () => { },
+  add_user_to_room: addUserToRoom,
   add_ships: () => { },
   attack: () => { },
   randomAttack: () => { },
@@ -46,8 +47,15 @@ export const startWebSocketServer = (port: number) => {
       }
     });
   });
+  return wsServer;
 };
 
 function isMessageHandler(type: any): type is IInputTypeMsg {
   return type in messageHandlers;
 }
+
+export function sendMsgToMultiple(destinationWsIds: string[], msg: string) {
+  const allWsClients = [...wsServer.clients] as ExtendedWebSocket[];
+  const responseList = allWsClients.filter(client => destinationWsIds.includes(client.id));
+  responseList.forEach(client => client.send(msg))
+};
