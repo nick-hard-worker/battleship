@@ -13,16 +13,8 @@ export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
         }
       ]
     });
-  const noFullRooms = roomRepository.getAll().filter(room => room.roomUsers.length < 2);
 
-  const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id } })
-  const response = {
-    type: 'update_room',
-    data: JSON.stringify(dataResponse),
-    id,
-  };
-
-  ws.send(JSON.stringify(response));
+  wsSendUpdateRoom(ws, id)
 }
 
 export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
@@ -48,7 +40,8 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
           userId: currentUser.id,
           ships: []
         }
-      ]
+      ],
+      activeUserId: firstUser.id
     });
 
     const responseToCurrent = {
@@ -72,4 +65,17 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
 
     sendMsgsByWsID(firstUser.wsId, JSON.stringify(responseToFirst));
   }
+}
+
+export function wsSendUpdateRoom(ws: ExtendedWebSocket, id: number) {
+  const noFullRooms = roomRepository.getAll().filter(room => room.roomUsers.length < 2);
+
+  const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id } })
+  const response = {
+    type: 'update_room',
+    data: JSON.stringify(dataResponse),
+    id,
+  };
+
+  ws.send(JSON.stringify(response));
 }

@@ -1,4 +1,5 @@
 import { userRepository, IUser } from './db/db.js';
+import { wsSendUpdateRoom } from './room-handler.js';
 import { ExtendedWebSocket } from './websocket-server.js'
 
 // type "reg" handler:
@@ -27,4 +28,5 @@ export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number)
   console.log('total users: ' + userRepository.getAll().length);
 
   ws.send(JSON.stringify(response));
+  wsSendUpdateRoom(ws, id)
 }

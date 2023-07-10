@@ -4,6 +4,7 @@ import { handleRegistration } from './reg-handler.js';
 import { createRoom, addUserToRoom } from './room-handler.js';
 import { wsServer } from '../../index.js'
 import { addShips } from './ships-handler.js';
+import { attack } from './attack-handler.js';
 
 export interface ExtendedWebSocket extends WebSocket {
   id: string;
@@ -17,8 +18,8 @@ const messageHandlers: Record<IInputTypeMsg, MessageHandler> = {
   create_room: createRoom,
   add_user_to_room: addUserToRoom,
   add_ships: addShips,
-  attack: () => { },
-  randomAttack: () => { },
+  attack: attack,
+  randomAttack: attack,
 };
 
 export const startWebSocketServer = (port: number) => {

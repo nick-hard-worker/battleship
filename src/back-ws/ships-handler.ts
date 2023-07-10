@@ -15,44 +15,46 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
     currentGame.players[index].ships.push(shipFromData);
     // console.log(shipFromData.allCoords());
   }
-  gameRepository.update(currentGame)
+  gameRepository.update(currentGame);
 
-  console.log(currentGame)
+  console.log(currentGame);
 
-  if (currentGame.players[0].ships.length > 0 && currentGame.players[1].ships.length > 0) {
-    const secondPlayer = currentGame.players.find(player => player.userId !== playerId);
-    const secondUser = userRepository.getById(secondPlayer?.userId as number) as IUser;
-    const responseСurrent = {
-      type: "start_game",
-      data: JSON.stringify(
-        {
-          ships:
-            [],
-          currentPlayerIndex: playerId
-        }),
-      id: 0
-    }
-    const responseSecond = {
-      type: "start_game",
-      data: JSON.stringify(
-        {
-          ships:
-            [],
-          currentPlayerIndex: secondUser.id
-        }),
-      id: 0
-    }
-    ws.send(JSON.stringify(responseСurrent))
-    sendMsgsByWsID(secondUser.wsId, JSON.stringify(responseSecond));
+  if (currentGame.players[0].ships.length === 0 || currentGame.players[1].ships.length === 0) return;
 
-    const responseTurn =
-    {
-      type: "turn",
-      data: JSON.stringify({
-        currentPlayer: currentGame.gameId,
+  // two users in room:
+  const secondPlayer = currentGame.players.find(player => player.userId !== playerId);
+  const secondUser = userRepository.getById(secondPlayer?.userId as number) as IUser;
+  const responseСurrent = {
+    type: "start_game",
+    data: JSON.stringify(
+      {
+        ships:
+          [],
+        currentPlayerIndex: playerId
       }),
-      id: 0,
-    };
-    sendMsgsByWsID([ws.id, secondUser.wsId], JSON.stringify(responseTurn));
+    id: 0
   }
+  const responseSecond = {
+    type: "start_game",
+    data: JSON.stringify(
+      {
+        ships:
+          [],
+        currentPlayerIndex: secondUser.id
+      }),
+    id: 0
+  }
+  ws.send(JSON.stringify(responseСurrent))
+  sendMsgsByWsID(secondUser.wsId, JSON.stringify(responseSecond));
+
+  const responseTurn =
+  {
+    type: 'turn',
+    data: JSON.stringify({
+      currentPlayer: currentGame.activeUserId,
+    }),
+    id: 0,
+  };
+  sendMsgsByWsID([ws.id, secondUser.wsId], JSON.stringify(responseTurn));
+
 }

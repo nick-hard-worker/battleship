@@ -44,8 +44,11 @@ interface IPlayer {
 export interface IGame {
   id: number,
   gameId: number,
-  players: IPlayer[]
+  players: IPlayer[],
+  activeUserId: number
 }
+
+
 
 // export class Game implements IGame {
 //   gameId: number
