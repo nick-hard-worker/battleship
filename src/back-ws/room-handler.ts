@@ -1,5 +1,5 @@
 import { roomRepository, userRepository, IUser, gameRepository } from './db/db.js';
-import { ExtendedWebSocket, sendMsgToMultiple } from './websocket-server.js'
+import { ExtendedWebSocket, sendMsgsByWsID } from './websocket-server.js'
 // 2 actions for room: createRoom, addUserToRoom:
 
 export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
@@ -70,6 +70,6 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
       id: 0,
     }
 
-    sendMsgToMultiple([firstUser.wsId], JSON.stringify(responseToFirst));
+    sendMsgsByWsID(firstUser.wsId, JSON.stringify(responseToFirst));
   }
 }

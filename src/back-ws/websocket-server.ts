@@ -53,7 +53,8 @@ function isMessageHandler(type: any): type is IInputTypeMsg {
   return type in messageHandlers;
 }
 
-export function sendMsgToMultiple(destinationWsIds: string[], msg: string) {
+export function sendMsgsByWsID(destinationWsIds: string[] | string, msg: string) {
+  if (typeof destinationWsIds === 'string') { destinationWsIds = [destinationWsIds] }
   const allWsClients = [...wsServer.clients] as ExtendedWebSocket[];
   const responseList = allWsClients.filter(client => destinationWsIds.includes(client.id));
   responseList.forEach(client => client.send(msg))

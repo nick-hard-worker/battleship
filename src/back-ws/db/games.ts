@@ -47,11 +47,13 @@ export interface IGame {
   players: IPlayer[]
 }
 
-// class GameRepository extends InMemoryRepository<IGame, Omit<IGame, 'id'>> {
-//   create(id1: number, id2: number) {
-//     const game: Omit<IGame, 'id'> = {
-//       gameId: id1,
-//       players: [
+// export class Game implements IGame {
+//   gameId: number
+//   players:
+
+//   constructor(id1: number, id2: number) {
+//     this.gameId: id1,
+//       this.players: [
 //         {
 //           userId: id1,
 //           ships: []
@@ -61,8 +63,6 @@ export interface IGame {
 //           ships: []
 //         }
 //       ]
-//     }
-//     super.create(game)
 //   }
 // }
 

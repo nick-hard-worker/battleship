@@ -1,6 +1,6 @@
 import { gameRepository, IGame, IUser, userRepository } from './db/db.js';
 import { Ship } from './db/games.js';
-import { ExtendedWebSocket, sendMsgToMultiple } from './websocket-server.js'
+import { ExtendedWebSocket, sendMsgsByWsID } from './websocket-server.js'
 
 export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
   // console.log(data)
@@ -24,25 +24,35 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
     const secondUser = userRepository.getById(secondPlayer?.userId as number) as IUser;
     const responseСurrent = {
       type: "start_game",
-      data:
-      {
-        ships:
-          [],
-        currentPlayerIndex: playerId
-      },
+      data: JSON.stringify(
+        {
+          ships:
+            [],
+          currentPlayerIndex: playerId
+        }),
       id: 0
     }
     const responseSecond = {
       type: "start_game",
-      data:
-      {
-        ships:
-          [],
-        currentPlayerIndex: secondUser.id
-      },
+      data: JSON.stringify(
+        {
+          ships:
+            [],
+          currentPlayerIndex: secondUser.id
+        }),
       id: 0
     }
     ws.send(JSON.stringify(responseСurrent))
-    sendMsgToMultiple([secondUser.wsId], JSON.stringify(responseSecond));
+    sendMsgsByWsID(secondUser.wsId, JSON.stringify(responseSecond));
+
+    const responseTurn =
+    {
+      type: "turn",
+      data: JSON.stringify({
+        currentPlayer: currentGame.gameId,
+      }),
+      id: 0,
+    };
+    sendMsgsByWsID([ws.id, secondUser.wsId], JSON.stringify(responseTurn));
   }
 }
