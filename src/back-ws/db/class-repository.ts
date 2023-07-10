@@ -19,7 +19,7 @@ export class InMemoryRepository<T1 extends Entity, T2 extends NoIdEntity> {
     return this.entities.find(entity => entity.id === id);
   }
 
-  create(entity: T2) {
+  add(entity: T2) {
     const id = this.entities.length + 1;
     const entityWithId: T1 = { ...entity, id } as unknown as T1;
     this.entities.push(entityWithId);

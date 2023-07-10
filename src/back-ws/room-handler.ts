@@ -4,7 +4,7 @@ import { ExtendedWebSocket, sendMsgToMultiple } from './websocket-server.js'
 
 export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
-  const createdRoom = roomRepository.create(
+  const createdRoom = roomRepository.add(
     {
       roomUsers: [
         {
@@ -37,7 +37,7 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
     const firstUser = userRepository.getById(roomForGame.roomUsers[0].index) as IUser;
 
     roomRepository.update(roomForGame);
-    gameRepository.create({
+    gameRepository.add({
       gameId: firstUser.id,
       players: [
         {
