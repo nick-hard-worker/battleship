@@ -14,7 +14,8 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
 
   if (shotResult === "killed") {
     const killedShipIndex = currentGame.getEnemyShipIndex(attackCoords);
-    for (const coord of currentGame.getEnemyShips()[killedShipIndex].hittings) {
+    const kiledShip = currentGame.getEnemyShips()[killedShipIndex]
+    for (const coord of kiledShip.hittings) {
       const attackResponse = {
         type: "attack",
         data: JSON.stringify({
@@ -24,8 +25,22 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
         }),
         id,
       }
-      sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse))
+      sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse));
     }
+    const missedCoords = generateMissCoords(kiledShip.allCoords());
+    for (const coord of missedCoords) {
+      const attackResponse = {
+        type: "attack",
+        data: JSON.stringify({
+          position: coord,
+          currentPlayer: data.indexPlayer, /* id of the player in the current game */
+          status: "miss",
+        }),
+        id,
+      }
+      sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse));
+    }
+
     return;
   }
 
@@ -54,4 +69,27 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
     };
     sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(responseTurn));
   }
+}
+
+function generateMissCoords(shipCoords: ICoords[]): ICoords[] {
+  const pointsArr: ICoords[] = [];
+  const minX = Math.min(...shipCoords.map(item => item.x));
+  const maxX = Math.max(...shipCoords.map(item => item.x));
+  const minY = Math.min(...shipCoords.map(item => item.y));
+  const maxY = Math.max(...shipCoords.map(item => item.y));
+  const leftUpX = (minX === 0) ? minX : (minX - 1);
+  const leftUpY = (minY === 0) ? minY : (minY - 1);
+  const rightDownX = (maxX === 9) ? maxX : (maxX + 1);
+  const rightDownY = (maxY === 9) ? maxY : (maxY + 1);
+
+  for (let x = leftUpX; x <= rightDownX; x++) {
+    for (let y = leftUpY; y <= rightDownY; y++) {
+      const point: ICoords = { x, y };
+      if (!shipCoords.some(shipCoord => shipCoord.x === x && shipCoord.y === y)) {
+        pointsArr.push(point);
+      }
+    }
+  }
+
+  return pointsArr;
 }
