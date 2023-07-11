@@ -1,36 +1,31 @@
-type Entity = {
-  id: number;
-  [key: string]: any;
-}
-type NoIdEntity = Omit<Entity, 'id'>;
-
-export class InMemoryRepository<T1 extends Entity, T2 extends NoIdEntity> {
-  protected entities: T1[];
+export class InMemoryRepository<T extends { id?: number }> {
+  protected entities: T[];
+  private nextId: number;
 
   constructor() {
     this.entities = [];
+    this.nextId = 0;
   }
 
   getAll() {
     return this.entities;
   }
 
-  getById(id: number) {
+  getById(id: number): T | undefined {
     return this.entities.find(entity => entity.id === id);
   }
 
-  add(entity: T2) {
-    const id = this.entities.length + 1;
-    const entityWithId: T1 = { ...entity, id } as unknown as T1;
+  add(entity: T): T {
+    const entityWithId = { ...entity, id: this.nextId++ };
     this.entities.push(entityWithId);
     return entityWithId;
   }
 
-  update(updatedEntity: T1) {
+  update(updatedEntity: T) {
     const index = this.entities.findIndex(entity => entity.id === updatedEntity.id);
     if (index !== -1) {
-      this.entities[index] = updatedEntity;
-      return updatedEntity;
+      this.entities[index] = { ...updatedEntity };
+      return this.entities[index];
     }
   }
 

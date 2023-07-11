@@ -1,11 +1,11 @@
 import { InMemoryRepository } from './class-repository.js';
 
 export interface IRoom {
-  id: number;
+  id?: number;
   roomUsers: {
     name: string;
     index: number;
   }[]
 }
 
-export const roomRepository = new InMemoryRepository<IRoom, Omit<IRoom, 'id'>>();
+export const roomRepository = new InMemoryRepository<IRoom>();

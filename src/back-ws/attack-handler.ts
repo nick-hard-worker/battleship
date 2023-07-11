@@ -9,15 +9,15 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
   if (currentGame.activeUserId !== data.indexPlayer) return; // attacks from wrong player
 
   const attackCoords: ICoords = { x: data.x, y: data.y };
-  const result = currentGame.getAttackResult(attackCoords);
-  // gameRepository.update()
+  const shotResult = currentGame.getAttackResult(attackCoords);
+  gameRepository.update(currentGame)
 
   const attackResponse = {
     type: "attack",
     data: JSON.stringify({
       position: attackCoords,
       currentPlayer: data.indexPlayer, /* id of the player in the current game */
-      status: result,
+      status: shotResult,
     }),
     id,
   }

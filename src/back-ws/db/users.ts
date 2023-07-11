@@ -7,7 +7,7 @@ export interface IUser {
   wsId: string
 }
 
-class UserRepository extends InMemoryRepository<IUser, Omit<IUser, 'id'>> {
+class UserRepository extends InMemoryRepository<IUser> {
   constructor() {
     super();
   }

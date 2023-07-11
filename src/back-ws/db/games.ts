@@ -59,7 +59,7 @@ interface IGameConstructorParams {
 }
 
 export interface IGame {
-  // id: number,
+  id: number,
   gameId: number,
   players: IPlayer[],
   activeUserId: number,
@@ -67,12 +67,13 @@ export interface IGame {
 }
 
 export class Game implements IGame {
+  id: number
   gameId: number
   activeUserId: number
   players: IPlayer[]
 
   constructor({ gameId, activeUserId, players }: IGameConstructorParams) {
-    this.gameId = gameId;
+    this.id = this.gameId = gameId;
     this.activeUserId = activeUserId;
     this.players = players;
   }
@@ -115,7 +116,7 @@ export class Game implements IGame {
   }
 }
 
-class GameRepository extends InMemoryRepository<IGame & { id: number }, IGame> {
+class GameRepository extends InMemoryRepository<IGame> {
   constructor() {
     super();
   }
