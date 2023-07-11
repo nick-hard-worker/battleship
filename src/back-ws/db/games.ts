@@ -104,11 +104,8 @@ export class Game implements IGame {
   }
 
   getAttackResult(attackCoords: ICoords): attackStatus {
-    const enemyPlayer = this.players.filter(player => player.userId !== this.activeUserId)[0];
-    const enemyShips = enemyPlayer.ships.map(item => (new Ship(item)))
-    const shipIndex = enemyShips.findIndex(ship => ship.allCoords().some(
-      (item) => item.x === attackCoords.x && item.y === attackCoords.y))
-
+    const enemyShips = this.getEnemyShips()
+    const shipIndex = this.getEnemyShipIndex(attackCoords);
     if (shipIndex === -1) return "miss"
 
     if (!isAlreadyShot(enemyShips[shipIndex], attackCoords)) {
@@ -120,6 +117,18 @@ export class Game implements IGame {
     function isAlreadyShot(ship: Ship, coord: ICoords): boolean {
       return enemyShips[shipIndex].hittings.some((coord) => coord.x === attackCoords.x && coord.y === attackCoords.y)
     }
+  }
+
+  getEnemyShips() {
+    const enemyPlayer = this.players.filter(player => player.userId !== this.activeUserId)[0];
+    return enemyPlayer.ships.map(item => (new Ship(item)))
+  }
+  getEnemyShipIndex(attackCoords: ICoords) {
+    const enemyPlayer = this.players.filter(player => player.userId !== this.activeUserId)[0];
+    const enemyShips = enemyPlayer.ships.map(item => (new Ship(item)))
+    const shipIndex = enemyShips.findIndex(ship => ship.allCoords().some(
+      (item) => item.x === attackCoords.x && item.y === attackCoords.y))
+    return shipIndex
   }
 }
 
