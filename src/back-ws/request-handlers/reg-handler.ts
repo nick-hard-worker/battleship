@@ -1,6 +1,6 @@
-import { userRepository, IUser } from './db/models/users.js';
-import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
-import { ExtendedWebSocket } from './websocket-server.js'
+import { userRepository, IUser } from '../db/models/users.js';
+import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from '../responses/msgs.js';
+import { ExtendedWebSocket } from '../websocket-server.js'
 
 // type "reg" handler:
 export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number) {

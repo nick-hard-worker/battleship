@@ -1,8 +1,8 @@
-import { userRepository, IUser } from './db/models/users.js';
-import { roomRepository } from './db/models/rooms.js';
-import { Game, gameRepository } from './db/models/games.js';
-import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
-import { ExtendedWebSocket } from './websocket-server.js'
+import { userRepository, IUser } from '../db/models/users.js';
+import { roomRepository } from '../db/models/rooms.js';
+import { Game, gameRepository } from '../db/models/games.js';
+import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from '../responses/msgs.js';
+import { ExtendedWebSocket } from '../websocket-server.js'
 
 // 2 actions for room: createRoom, addUserToRoom:
 

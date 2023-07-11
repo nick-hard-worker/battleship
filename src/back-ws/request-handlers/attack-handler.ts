@@ -1,7 +1,7 @@
-import { ICoords, Game, gameRepository } from "./db/models/games.js";
-import { IUser, userRepository } from "./db/models/users.js";
-import { ResType, formResponse, sendMsgsByWsID } from "./messages/msgs.js";
-import { ExtendedWebSocket } from "./websocket-server.js";
+import { ICoords, Game, gameRepository } from "../db/models/games.js";
+import { IUser, userRepository } from "../db/models/users.js";
+import { ResType, formResponse, sendMsgsByWsID } from "../responses/msgs.js";
+import { ExtendedWebSocket } from "../websocket-server.js";
 
 export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
   const gameData = gameRepository.getByGameId(data.gameId);

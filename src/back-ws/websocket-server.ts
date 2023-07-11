@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { WebSocketServer, WebSocket } from 'ws';
-import { handleRegistration } from './reg-handler.js';
-import { createRoom, addUserToRoom } from './room-handler.js';
-import { addShips } from './ships-handler.js';
-import { attack } from './attack-handler.js';
+import { handleRegistration } from './request-handlers/reg-handler.js';
+import { createRoom, addUserToRoom } from './request-handlers/room-handler.js';
+import { addShips } from './request-handlers/ships-handler.js';
+import { attack } from './request-handlers/attack-handler.js';
 
 export interface ExtendedWebSocket extends WebSocket {
   id: string;

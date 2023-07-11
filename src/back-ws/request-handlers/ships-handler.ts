@@ -1,8 +1,8 @@
-import { IUser, userRepository } from './db/models/users.js';
-import { gameRepository, IGame } from './db/models/games.js';
-import { Game, Ship } from './db/models/games.js';
-import { sendMsgsByWsID } from './messages/msgs.js';
-import { ExtendedWebSocket } from './websocket-server.js'
+import { IUser, userRepository } from '../db/models/users.js';
+import { gameRepository } from '../db/models/games.js';
+import { Game, Ship } from '../db/models/games.js';
+import { sendMsgsByWsID } from '../responses/msgs.js';
+import { ExtendedWebSocket } from '../websocket-server.js'
 
 export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
   const gameData = gameRepository.getByGameId(data.gameId)
@@ -15,7 +15,6 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
   for (const ship of ships) {
     const shipFromData = new Ship(ship);
     currentGame.players[index].ships.push(shipFromData);
-    // console.log(shipFromData.allCoords());
   }
   gameRepository.update(currentGame);
 
