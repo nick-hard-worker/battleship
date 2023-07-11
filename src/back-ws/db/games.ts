@@ -97,6 +97,11 @@ export class Game implements IGame {
     return new Game(game)
   }
 
+  changeActiveUser() {
+    const nextPlayer = this.players.find(item => item.userId !== this.activeUserId);
+    this.activeUserId = nextPlayer?.userId as number;
+  }
+
   getWsIds() {
     return this.players
       .map(item => item.userId)

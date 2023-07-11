@@ -1,11 +1,12 @@
 import { gameRepository, IGame, IUser, userRepository } from './db/db.js';
-import { Ship } from './db/games.js';
+import { Game, Ship } from './db/games.js';
 import { ExtendedWebSocket, sendMsgsByWsID } from './websocket-server.js'
 
 export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
-  // console.log(gameRepository.getAll());
-  const currentGame = gameRepository.getByGameId(data.gameId)
-  if (!currentGame) return;
+  const gameData = gameRepository.getByGameId(data.gameId)
+  if (!gameData) return;
+
+  const currentGame = new Game(gameData);
   const playerId = data.indexPlayer;
   const index = currentGame.players.findIndex(player => player.userId === playerId);
   const ships = data.ships as Ship[];
@@ -52,6 +53,6 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
     }),
     id: 0,
   };
-  sendMsgsByWsID([ws.id, secondUser.wsId], JSON.stringify(responseTurn));
+  sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(responseTurn));
 
 }

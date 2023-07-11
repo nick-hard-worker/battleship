@@ -39,4 +39,19 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
     id,
   }
   sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse))
+
+  if (shotResult === "miss") {
+    currentGame.changeActiveUser();
+    gameRepository.update(currentGame);
+
+    const responseTurn =
+    {
+      type: 'turn',
+      data: JSON.stringify({
+        currentPlayer: currentGame.activeUserId,
+      }),
+      id: 0,
+    };
+    sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(responseTurn));
+  }
 }
