@@ -1,5 +1,5 @@
 import { userRepository, IUser } from '../db/models/users.js';
-import { roomRepository } from '../db/models/rooms.js';
+import { IRoom, roomRepository } from '../db/models/rooms.js';
 import { Game, gameRepository } from '../db/models/games.js';
 import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from '../responses/msgs.js';
 import { ExtendedWebSocket } from '../websocket-server.js'
@@ -33,33 +33,38 @@ function isUserHaveRoom(userId: number) {
 
 export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
-  const roomForGame = roomRepository.getById(data.indexRoom);
-  console.log(roomForGame);
-  if (roomForGame && roomForGame.roomUsers.length === 1) {
-    roomForGame.roomUsers.push({
-      name: currentUser.name,
-      index: currentUser.id
-    })
-    const firstUser = userRepository.getById(roomForGame.roomUsers[0].index) as IUser;
+  const roomForGame = roomRepository.getById(data.indexRoom) as IRoom;
 
-    roomRepository.update(roomForGame);
-    let newGame = Game.initGame(firstUser.id, currentUser.id);
-    gameRepository.add(newGame);
+  // try to connect to pwn room:
+  if (roomForGame && roomForGame.roomUsers[0].index === currentUser.id) return;
 
-    const dataToCurrentUser = {
-      idGame: firstUser.id,
-      idPlayer: currentUser.id
-    }
-    const responseToCurrent = formResponse(ResType.createGame, dataToCurrentUser);
-    ws.send(JSON.stringify(responseToCurrent))
+  // room already full
+  if (roomForGame && roomForGame.roomUsers.length === 2) return
 
-    const dataToFirst = {
-      idGame: firstUser.id,
-      idPlayer: firstUser.id
-    }
-    const responseToFirst = formResponse(ResType.createGame, dataToFirst)
-    sendMsgsByWsID(firstUser.wsId, responseToFirst);
+  roomForGame.roomUsers.push({
+    name: currentUser.name,
+    index: currentUser.id
+  })
+  const firstUser = userRepository.getById(roomForGame.roomUsers[0].index) as IUser;
 
-    roomRepository.delete(data.indexRoom);
+  roomRepository.update(roomForGame);
+  let newGame = Game.initGame(firstUser.id, currentUser.id);
+  gameRepository.add(newGame);
+
+  const dataToCurrentUser = {
+    idGame: firstUser.id,
+    idPlayer: currentUser.id
   }
+  const responseToCurrent = formResponse(ResType.createGame, dataToCurrentUser);
+  ws.send(JSON.stringify(responseToCurrent))
+
+  const dataToFirst = {
+    idGame: firstUser.id,
+    idPlayer: firstUser.id
+  }
+  const responseToFirst = formResponse(ResType.createGame, dataToFirst)
+  sendMsgsByWsID(firstUser.wsId, responseToFirst);
+
+  roomRepository.delete(data.indexRoom);
 }
+
