@@ -1,11 +1,13 @@
 import { roomRepository, userRepository, IUser, gameRepository } from './db/db.js';
 import { Game } from './db/games.js';
-import { sendMsgsByWsID } from './messages/msgs.js';
+import { sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
 import { ExtendedWebSocket } from './websocket-server.js'
 // 2 actions for room: createRoom, addUserToRoom:
 
 export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
+  if (isUserHaveRoom(currentUser.id)) return;
+
   const createdRoom = roomRepository.add(
     {
       roomUsers: [
@@ -16,7 +18,15 @@ export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
       ]
     });
 
-  wsSendUpdateRoom(ws, id)
+  wsSendUpdateRoom(ws)
+}
+
+function isUserHaveRoom(userId: number) {
+  const findIndex = roomRepository
+    .getAll()
+    .findIndex(room => room.roomUsers.some(user => userId === userId))
+  if (findIndex === -1) return false
+  return true
 }
 
 export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
@@ -55,17 +65,4 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
 
     sendMsgsByWsID(firstUser.wsId, responseToFirst);
   }
-}
-
-export function wsSendUpdateRoom(ws: ExtendedWebSocket, id: number) {
-  const noFullRooms = roomRepository.getAll().filter(room => room.roomUsers.length < 2);
-
-  const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id } })
-  const response = {
-    type: 'update_room',
-    data: JSON.stringify(dataResponse),
-    id,
-  };
-
-  ws.send(JSON.stringify(response));
 }
