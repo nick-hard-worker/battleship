@@ -1,6 +1,6 @@
 import { ICoords, Game, gameRepository } from "./db/games.js";
 import { IUser, userRepository } from "./db/users.js";
-import { sendMsgsByWsID } from "./messages/msgs.js";
+import { ResType, formResponse, sendMsgsByWsID } from "./messages/msgs.js";
 import { ExtendedWebSocket } from "./websocket-server.js";
 
 export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
@@ -44,17 +44,18 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
     }
 
     if (currentGame.isEndGame()) {
+      // update winners
       const currentUser = userRepository.getById(currentGame.activeUserId) as IUser;
       currentUser.wins++;
       userRepository.update(currentUser);
+      const dataWinners = userRepository.getWinners();
+      const responseWinners = formResponse(ResType.updateWinners, dataWinners);
+      sendMsgsByWsID('all', responseWinners);
 
-      const finishResponse = {
-        type: "finish",
-        data: JSON.stringify({
-          winPlayer: currentGame.activeUserId,
-        }),
-        id
-      }
+      const dataFinish = {
+        winPlayer: currentGame.activeUserId,
+      };
+      const finishResponse = formResponse(ResType.finish, dataFinish);
       sendMsgsByWsID(currentGame.getWsIds(), finishResponse)
     }
     return;

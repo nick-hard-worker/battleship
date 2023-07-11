@@ -1,5 +1,5 @@
 import { userRepository, IUser } from './db/db.js';
-import { ResType, formResponse, wsSendUpdateRoom } from './messages/msgs.js';
+import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
 import { ExtendedWebSocket } from './websocket-server.js'
 
 // type "reg" handler:
@@ -22,14 +22,9 @@ export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number)
   }
   const responseReg = formResponse(ResType.reg, dataResponse)
   ws.send(JSON.stringify(responseReg));
-  wsSendUpdateRoom(ws)
+  wsSendUpdateRoom()
 
-  const winners = userRepository.getWinners();
-  const responseWinners = {
-    type: "update_winners",
-    data: JSON.stringify(winners),
-    id
-  }
-
-  ws.send(JSON.stringify(responseWinners));
+  const dataWinners = userRepository.getWinners();
+  const responseWinners = formResponse(ResType.updateWinners, dataWinners);
+  sendMsgsByWsID('all', responseWinners)
 }

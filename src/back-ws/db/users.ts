@@ -36,7 +36,7 @@ class UserRepository extends InMemoryRepository<IUser> {
 
   getWinners() {
     return this.getAll()
-      .sort((a, b) => (a.wins - b.wins))
+      .sort((a, b) => (b.wins - a.wins))
       .map(({ name, wins }) => ({ name, wins }))
   }
 }

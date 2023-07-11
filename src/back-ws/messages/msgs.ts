@@ -15,7 +15,8 @@ export const enum ResType {
   createGame = 'create_game',
   startGame = 'start_game',
   turn = 'turn',
-  attack = 'attack'
+  attack = 'attack',
+  finish = 'finish'
 }
 
 export function formResponse(type: ResType, data: any): IMsg {
@@ -41,12 +42,11 @@ export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg:
   responseList.forEach(client => client.send(message));
 };
 
-export function wsSendUpdateRoom(ws: ExtendedWebSocket) {
+export function wsSendUpdateRoom() {
   const noFullRooms = roomRepository.getAll().filter(room => room.roomUsers.length < 2);
   const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id } })
-
-  console.log(dataResponse)
+  // console.log(dataResponse)
 
   const response = formResponse(ResType.updateRoom, dataResponse);
-  ws.send(JSON.stringify(response));
+  sendMsgsByWsID('all', response)
 }

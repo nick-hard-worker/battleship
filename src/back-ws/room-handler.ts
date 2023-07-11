@@ -1,6 +1,6 @@
 import { roomRepository, userRepository, IUser, gameRepository } from './db/db.js';
 import { Game } from './db/games.js';
-import { sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
+import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
 import { ExtendedWebSocket } from './websocket-server.js'
 // 2 actions for room: createRoom, addUserToRoom:
 
@@ -8,7 +8,7 @@ export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
   if (isUserHaveRoom(currentUser.id)) return;
 
-  const createdRoom = roomRepository.add(
+  roomRepository.add(
     {
       roomUsers: [
         {
@@ -18,7 +18,7 @@ export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
       ]
     });
 
-  wsSendUpdateRoom(ws)
+  wsSendUpdateRoom()
 }
 
 function isUserHaveRoom(userId: number) {
@@ -44,25 +44,20 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
     let newGame = Game.initGame(firstUser.id, currentUser.id);
     gameRepository.add(newGame);
 
-    const responseToCurrent = {
-      type: "create_game",
-      data: JSON.stringify({
-        idGame: firstUser.id,
-        idPlayer: currentUser.id
-      }),
-      id: 0,
+    const dataToCurrentUser = {
+      idGame: firstUser.id,
+      idPlayer: currentUser.id
     }
+    const responseToCurrent = formResponse(ResType.createGame, dataToCurrentUser);
     ws.send(JSON.stringify(responseToCurrent))
 
-    const responseToFirst = {
-      type: "create_game",
-      data: JSON.stringify({
-        idGame: firstUser.id,
-        idPlayer: firstUser.id
-      }),
-      id: 0,
+    const dataToFirst = {
+      idGame: firstUser.id,
+      idPlayer: firstUser.id
     }
-
+    const responseToFirst = formResponse(ResType.createGame, dataToFirst)
     sendMsgsByWsID(firstUser.wsId, responseToFirst);
+
+    roomRepository.delete(data.indexRoom);
   }
 }
