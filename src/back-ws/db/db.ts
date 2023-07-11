@@ -1,5 +1,5 @@
-import { userRepository, IUser } from "./users.js";
-import { roomRepository, IRoom } from "./rooms.js";
-import { gameRepository, IGame } from "./games.js";
+import { userRepository } from "./models/users.js";
+import { roomRepository } from "./models/rooms.js";
+import { gameRepository } from "./models/games.js";
 
-export { userRepository, IUser, roomRepository, IRoom, gameRepository, IGame }
+export { userRepository, roomRepository, gameRepository }

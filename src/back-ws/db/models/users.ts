@@ -1,4 +1,4 @@
-import { InMemoryRepository } from './class-repository.js';
+import { InMemoryRepository } from '../class-repository.js';
 
 export interface IUser {
   id: number;

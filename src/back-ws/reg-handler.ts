@@ -1,4 +1,4 @@
-import { userRepository, IUser } from './db/db.js';
+import { userRepository, IUser } from './db/models/users.js';
 import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
 import { ExtendedWebSocket } from './websocket-server.js'
 

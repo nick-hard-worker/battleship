@@ -1,5 +1,6 @@
-import { gameRepository, IGame, IUser, userRepository } from './db/db.js';
-import { Game, Ship } from './db/games.js';
+import { IUser, userRepository } from './db/models/users.js';
+import { gameRepository, IGame } from './db/models/games.js';
+import { Game, Ship } from './db/models/games.js';
 import { sendMsgsByWsID } from './messages/msgs.js';
 import { ExtendedWebSocket } from './websocket-server.js'
 

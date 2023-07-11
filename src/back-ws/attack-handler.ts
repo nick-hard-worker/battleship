@@ -1,5 +1,5 @@
-import { ICoords, Game, gameRepository } from "./db/games.js";
-import { IUser, userRepository } from "./db/users.js";
+import { ICoords, Game, gameRepository } from "./db/models/games.js";
+import { IUser, userRepository } from "./db/models/users.js";
 import { ResType, formResponse, sendMsgsByWsID } from "./messages/msgs.js";
 import { ExtendedWebSocket } from "./websocket-server.js";
 

@@ -1,5 +1,5 @@
 import { wsServer } from '../../../index.js'
-import { roomRepository } from '../db/rooms.js';
+import { roomRepository } from '../db/models/rooms.js';
 import { ExtendedWebSocket } from '../websocket-server.js';
 
 export interface IMsg {

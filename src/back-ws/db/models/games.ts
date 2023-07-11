@@ -1,4 +1,4 @@
-import { InMemoryRepository } from "./class-repository.js";
+import { InMemoryRepository } from "../class-repository.js";
 import { userRepository } from "./users.js";
 
 export interface ICoords {

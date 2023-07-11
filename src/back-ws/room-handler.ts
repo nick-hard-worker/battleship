@@ -1,7 +1,9 @@
-import { roomRepository, userRepository, IUser, gameRepository } from './db/db.js';
-import { Game } from './db/games.js';
+import { userRepository, IUser } from './db/models/users.js';
+import { roomRepository } from './db/models/rooms.js';
+import { Game, gameRepository } from './db/models/games.js';
 import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './messages/msgs.js';
 import { ExtendedWebSocket } from './websocket-server.js'
+
 // 2 actions for room: createRoom, addUserToRoom:
 
 export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
