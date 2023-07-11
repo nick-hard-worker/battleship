@@ -22,7 +22,7 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
   // two users in room:
   const secondPlayer = currentGame.players.find(player => player.userId !== playerId);
   const secondUser = userRepository.getById(secondPlayer?.userId as number) as IUser;
-  const responseСurrent = {
+  const responseCurrent = {
     type: "start_game",
     data: JSON.stringify(
       {
@@ -42,7 +42,7 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
       }),
     id: 0
   }
-  ws.send(JSON.stringify(responseСurrent))
+  ws.send(JSON.stringify(responseCurrent))
   sendMsgsByWsID(secondUser.wsId, JSON.stringify(responseSecond));
 
   const responseTurn =

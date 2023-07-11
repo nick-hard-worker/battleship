@@ -1,6 +1,6 @@
 import { ICoords, Game, gameRepository } from "./db/games.js";
+import { IUser, userRepository } from "./db/users.js";
 import { ExtendedWebSocket, sendMsgsByWsID } from "./websocket-server.js";
-
 
 export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
   const gameData = gameRepository.getByGameId(data.gameId);
@@ -14,8 +14,8 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
 
   if (shotResult === "killed") {
     const killedShipIndex = currentGame.getEnemyShipIndex(attackCoords);
-    const kiledShip = currentGame.getEnemyShips()[killedShipIndex]
-    for (const coord of kiledShip.hittings) {
+    const killedShip = currentGame.getEnemyShips()[killedShipIndex]
+    for (const coord of killedShip.hittings) { // mark as kill all points of ship
       const attackResponse = {
         type: "attack",
         data: JSON.stringify({
@@ -27,8 +27,9 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
       }
       sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse));
     }
-    const missedCoords = generateMissCoords(kiledShip.allCoords());
-    for (const coord of missedCoords) {
+
+    const aroundCoords = getAroundCoords(killedShip.allCoords());
+    for (const coord of aroundCoords) {
       const attackResponse = {
         type: "attack",
         data: JSON.stringify({
@@ -41,6 +42,20 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
       sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse));
     }
 
+    if (currentGame.isEndGame()) {
+      const currentUser = userRepository.getById(currentGame.activeUserId) as IUser;
+      currentUser.wins++;
+      userRepository.update(currentUser);
+
+      const finishResponse = {
+        type: "finish",
+        data: JSON.stringify({
+          winPlayer: currentGame.activeUserId,
+        }),
+        id
+      }
+      sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(finishResponse))
+    }
     return;
   }
 
@@ -71,7 +86,7 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
   }
 }
 
-function generateMissCoords(shipCoords: ICoords[]): ICoords[] {
+function getAroundCoords(shipCoords: ICoords[]): ICoords[] {
   const pointsArr: ICoords[] = [];
   const minX = Math.min(...shipCoords.map(item => item.x));
   const maxX = Math.max(...shipCoords.map(item => item.x));

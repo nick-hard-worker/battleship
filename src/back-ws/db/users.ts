@@ -5,7 +5,21 @@ export interface IUser {
   name: string;
   password: string;
   wsId: string
+  wins: number
 }
+
+// export class User implements IUser {
+//   name: string;
+//   password: string;
+//   wsId: string
+//   wins: number
+//   constructor(name: string, password: string, wsId: string) {
+//     this.name = name;
+//     this.password = password;
+//     this.wsId = wsId;
+//     this.wins = 0;
+//   }
+// }
 
 class UserRepository extends InMemoryRepository<IUser> {
   constructor() {
@@ -18,6 +32,12 @@ class UserRepository extends InMemoryRepository<IUser> {
 
   getByWsId(wsId: string) {
     return this.entities.find(user => user.wsId === wsId);
+  }
+
+  getWinners() {
+    return this.getAll()
+      .sort((a, b) => (a.wins - b.wins))
+      .map(({ name, wins }) => ({ name, wins }))
   }
 }
 

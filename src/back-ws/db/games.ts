@@ -135,6 +135,11 @@ export class Game implements IGame {
       (item) => item.x === attackCoords.x && item.y === attackCoords.y))
     return shipIndex
   }
+
+  isEndGame(): boolean {
+    const enemyShips = this.getEnemyShips();
+    return enemyShips.every(ship => ship.allCoords().length === ship.hittings.length)
+  }
 }
 
 class GameRepository extends InMemoryRepository<IGame> {

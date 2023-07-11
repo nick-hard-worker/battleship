@@ -31,7 +31,6 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
 
     roomRepository.update(roomForGame);
     let newGame = Game.initGame(firstUser.id, currentUser.id);
-    console.log(newGame.getAttackResult)
     gameRepository.add(newGame);
 
     const responseToCurrent = {

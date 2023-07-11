@@ -11,10 +11,10 @@ export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number)
     // check password
     connectedUser = userRepository.update({ ...foundUser, wsId: ws.id }) as IUser;
   }
-  else connectedUser = userRepository.add({ ...data, wsId: ws.id });
+  else connectedUser = userRepository.add({ ...data, wsId: ws.id, wins: 0 });
   console.log(connectedUser);
 
-  const response = {
+  const responseReg = {
     type: 'reg',
     data: JSON.stringify({
       name: connectedUser.name,
@@ -27,6 +27,15 @@ export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number)
 
   console.log('total users: ' + userRepository.getAll().length);
 
-  ws.send(JSON.stringify(response));
+  ws.send(JSON.stringify(responseReg));
   wsSendUpdateRoom(ws, id)
+
+  const winners = userRepository.getWinners();
+  const responseWinners = {
+    type: "update_winners",
+    data: JSON.stringify(winners),
+    id
+  }
+
+  ws.send(JSON.stringify(responseWinners));
 }
