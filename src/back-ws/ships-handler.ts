@@ -1,6 +1,7 @@
 import { gameRepository, IGame, IUser, userRepository } from './db/db.js';
 import { Game, Ship } from './db/games.js';
-import { ExtendedWebSocket, sendMsgsByWsID } from './websocket-server.js'
+import { sendMsgsByWsID } from './messages/msgs.js';
+import { ExtendedWebSocket } from './websocket-server.js'
 
 export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
   const gameData = gameRepository.getByGameId(data.gameId)

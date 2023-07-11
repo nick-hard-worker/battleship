@@ -1,6 +1,7 @@
 import { ICoords, Game, gameRepository } from "./db/games.js";
 import { IUser, userRepository } from "./db/users.js";
-import { ExtendedWebSocket, sendMsgsByWsID } from "./websocket-server.js";
+import { sendMsgsByWsID } from "./messages/msgs.js";
+import { ExtendedWebSocket } from "./websocket-server.js";
 
 export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
   const gameData = gameRepository.getByGameId(data.gameId);
