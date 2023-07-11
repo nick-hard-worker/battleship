@@ -43,7 +43,7 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
     id: 0
   }
   ws.send(JSON.stringify(responseCurrent))
-  sendMsgsByWsID(secondUser.wsId, JSON.stringify(responseSecond));
+  sendMsgsByWsID(secondUser.wsId, responseSecond);
 
   const responseTurn =
   {
@@ -53,6 +53,6 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
     }),
     id: 0,
   };
-  sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(responseTurn));
+  sendMsgsByWsID(currentGame.getWsIds(), responseTurn);
 
 }

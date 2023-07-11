@@ -52,7 +52,7 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
       id: 0,
     }
 
-    sendMsgsByWsID(firstUser.wsId, JSON.stringify(responseToFirst));
+    sendMsgsByWsID(firstUser.wsId, responseToFirst);
   }
 }
 

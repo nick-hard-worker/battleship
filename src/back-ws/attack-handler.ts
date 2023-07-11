@@ -25,7 +25,7 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
         }),
         id,
       }
-      sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse));
+      sendMsgsByWsID(currentGame.getWsIds(), attackResponse);
     }
 
     const aroundCoords = getAroundCoords(killedShip.allCoords());
@@ -39,7 +39,7 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
         }),
         id,
       }
-      sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse));
+      sendMsgsByWsID(currentGame.getWsIds(), attackResponse);
     }
 
     if (currentGame.isEndGame()) {
@@ -54,7 +54,7 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
         }),
         id
       }
-      sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(finishResponse))
+      sendMsgsByWsID(currentGame.getWsIds(), finishResponse)
     }
     return;
   }
@@ -68,7 +68,7 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
     }),
     id,
   }
-  sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse))
+  sendMsgsByWsID(currentGame.getWsIds(), attackResponse)
 
   if (shotResult === "miss") {
     currentGame.changeActiveUser();
@@ -82,7 +82,7 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
       }),
       id: 0,
     };
-    sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(responseTurn));
+    sendMsgsByWsID(currentGame.getWsIds(), responseTurn);
   }
 }
 

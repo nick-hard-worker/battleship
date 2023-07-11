@@ -5,6 +5,7 @@ import { createRoom, addUserToRoom } from './room-handler.js';
 import { wsServer } from '../../index.js'
 import { addShips } from './ships-handler.js';
 import { attack } from './attack-handler.js';
+import { IMsg } from './messages/msgs.js';
 
 export interface ExtendedWebSocket extends WebSocket {
   id: string;
@@ -54,9 +55,17 @@ function isMessageHandler(type: any): type is IInputTypeMsg {
   return type in messageHandlers;
 }
 
-export function sendMsgsByWsID(destinationWsIds: string[] | string, msg: string) {
-  if (typeof destinationWsIds === 'string') { destinationWsIds = [destinationWsIds] }
+export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg: IMsg) {
+  if (typeof destinationWsIds === 'string' &&
+    destinationWsIds !== 'all') { destinationWsIds = [destinationWsIds] }
+
   const allWsClients = [...wsServer.clients] as ExtendedWebSocket[];
-  const responseList = allWsClients.filter(client => destinationWsIds.includes(client.id));
-  responseList.forEach(client => client.send(msg))
+  let responseList;
+  if (destinationWsIds === 'all') { responseList = allWsClients }
+  else {
+    responseList = allWsClients.filter(client => destinationWsIds.includes(client.id));
+  }
+
+  const message = JSON.stringify(msg);
+  responseList.forEach(client => client.send(message));
 };
