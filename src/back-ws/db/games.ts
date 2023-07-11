@@ -1,4 +1,5 @@
 import { InMemoryRepository } from "./class-repository.js";
+import { userRepository } from "./users.js";
 
 export interface ICoords {
   x: number,
@@ -94,6 +95,12 @@ export class Game implements IGame {
       ]
     }
     return new Game(game)
+  }
+
+  getWsIds() {
+    return this.players
+      .map(item => item.userId)
+      .map(userId => userRepository.getById(userId)?.wsId) as string[];
   }
 
   getAttackResult(attackCoords: ICoords): attackStatus {

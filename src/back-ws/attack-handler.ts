@@ -1,5 +1,5 @@
 import { ICoords, Game, gameRepository } from "./db/games.js";
-import { ExtendedWebSocket } from "./websocket-server.js";
+import { ExtendedWebSocket, sendMsgsByWsID } from "./websocket-server.js";
 
 
 export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
@@ -22,5 +22,10 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
     id,
   }
 
-  ws.send(JSON.stringify(attackResponse))
+  // if (shotResult === "killed") {
+  //   for (const coord of )
+  //   return
+  // }
+  sendMsgsByWsID(currentGame.getWsIds(), JSON.stringify(attackResponse))
+  // ws.send()
 }
