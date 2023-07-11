@@ -1,6 +1,6 @@
 import { InMemoryRepository } from "./class-repository.js";
 
-interface ICoords {
+export interface ICoords {
   x: number,
   y: number,
 }
@@ -11,16 +11,26 @@ interface IShip {
   length: number,
   hittings: ICoords[],
   allCoords: () => ICoords[],
+}
 
+interface ShipConstructorParams {
+  position: ICoords,
+  direction: boolean,
+  length: number,
+  hittings?: ICoords[],
 }
 
 export class Ship implements IShip {
-  hittings: ICoords[];
-  constructor(
-    public position: ICoords,
-    public direction: boolean,
-    public length: number) {
-    this.hittings = [];
+  position: ICoords
+  direction: boolean
+  length: number
+  hittings: ICoords[]
+
+  constructor({ position, direction, length, hittings }: IShip) {
+    this.position = position;
+    this.length = length;
+    this.direction = direction;
+    this.hittings = hittings || [];
   }
 
   allCoords() {
@@ -33,7 +43,6 @@ export class Ship implements IShip {
 
     return coords;
   };
-
 }
 
 interface IPlayer {
@@ -41,33 +50,79 @@ interface IPlayer {
   ships: IShip[]
 }
 
-export interface IGame {
-  id: number,
-  gameId: number,
-  players: IPlayer[],
-  activeUserId: number
+type attackStatus = "miss" | "killed" | "shot";
+
+interface IGameConstructorParams {
+  gameId: number;
+  activeUserId: number;
+  players: IPlayer[];
 }
 
+export interface IGame {
+  // id: number,
+  gameId: number,
+  players: IPlayer[],
+  activeUserId: number,
+  getAttackResult: (coord: ICoords) => attackStatus;
+}
 
+export class Game implements IGame {
+  gameId: number
+  activeUserId: number
+  players: IPlayer[]
 
-// export class Game implements IGame {
-//   gameId: number
-//   players:
+  constructor({ gameId, activeUserId, players }: IGameConstructorParams) {
+    this.gameId = gameId;
+    this.activeUserId = activeUserId;
+    this.players = players;
+  }
 
-//   constructor(id1: number, id2: number) {
-//     this.gameId: id1,
-//       this.players: [
-//         {
-//           userId: id1,
-//           ships: []
-//         },
-//         {
-//           userId: id2,
-//           ships: []
-//         }
-//       ]
-//   }
-// }
+  static initGame(id1: number, id2: number) {
+    const game = {
+      gameId: id1,
+      activeUserId: id1,
+      players: [
+        {
+          userId: id1,
+          ships: []
+        },
+        {
+          userId: id2,
+          ships: []
+        }
+      ]
+    }
+    return new Game(game)
+  }
 
-// export const gameRepository = new GameRepository();
-export const gameRepository = new InMemoryRepository<IGame, Omit<IGame, 'id'>>();
+  getAttackResult(attackCoords: ICoords): attackStatus {
+    const enemyPlayer = this.players.filter(player => player.userId !== this.activeUserId)[0];
+    const enemyShips = enemyPlayer.ships.map(item => (new Ship(item)))
+    const shipIndex = enemyShips.findIndex(ship => ship.allCoords().some(
+      (item) => item.x === attackCoords.x && item.y === attackCoords.y))
+
+    if (shipIndex === -1) return "miss"
+
+    if (!isAlreadyShot(enemyShips[shipIndex], attackCoords)) {
+      enemyShips[shipIndex].hittings.push(attackCoords);
+    }
+    if (enemyShips[shipIndex].hittings.length === enemyShips[shipIndex].allCoords().length) return "killed"
+    return "shot"
+
+    function isAlreadyShot(ship: Ship, coord: ICoords): boolean {
+      return enemyShips[shipIndex].hittings.some((coord) => coord.x === attackCoords.x && coord.y === attackCoords.y)
+    }
+  }
+}
+
+class GameRepository extends InMemoryRepository<IGame & { id: number }, IGame> {
+  constructor() {
+    super();
+  }
+
+  getByGameId(id: number) {
+    return this.entities.find(game => game.gameId === id);
+  }
+}
+
+export const gameRepository = new GameRepository();

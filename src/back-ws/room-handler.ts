@@ -1,4 +1,5 @@
 import { roomRepository, userRepository, IUser, gameRepository } from './db/db.js';
+import { Game } from './db/games.js';
 import { ExtendedWebSocket, sendMsgsByWsID } from './websocket-server.js'
 // 2 actions for room: createRoom, addUserToRoom:
 
@@ -29,20 +30,9 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
     const firstUser = userRepository.getById(roomForGame.roomUsers[0].index) as IUser;
 
     roomRepository.update(roomForGame);
-    gameRepository.add({
-      gameId: firstUser.id,
-      players: [
-        {
-          userId: firstUser.id,
-          ships: []
-        },
-        {
-          userId: currentUser.id,
-          ships: []
-        }
-      ],
-      activeUserId: firstUser.id
-    });
+    let newGame = Game.initGame(firstUser.id, currentUser.id);
+    console.log(newGame.getAttackResult)
+    gameRepository.add(newGame);
 
     const responseToCurrent = {
       type: "create_game",

@@ -3,21 +3,18 @@ import { Ship } from './db/games.js';
 import { ExtendedWebSocket, sendMsgsByWsID } from './websocket-server.js'
 
 export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
-  // console.log(data)
-  console.log(gameRepository.getAll());
-  const currentGame = gameRepository.getById(data.gameId)
+  // console.log(gameRepository.getAll());
+  const currentGame = gameRepository.getByGameId(data.gameId)
   if (!currentGame) return;
   const playerId = data.indexPlayer;
-  const index = currentGame.players.findIndex(player => player.userId === playerId)
-  // currentGame.players[index].ships
-  for (const ship of data.ships) {
-    const shipFromData = new Ship(ship.position, ship.direction, ship.length);
+  const index = currentGame.players.findIndex(player => player.userId === playerId);
+  const ships = data.ships as Ship[];
+  for (const ship of ships) {
+    const shipFromData = new Ship(ship);
     currentGame.players[index].ships.push(shipFromData);
     // console.log(shipFromData.allCoords());
   }
   gameRepository.update(currentGame);
-
-  console.log(currentGame);
 
   if (currentGame.players[0].ships.length === 0 || currentGame.players[1].ships.length === 0) return;
 
