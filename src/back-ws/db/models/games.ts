@@ -14,13 +14,6 @@ interface IShip {
   allCoords: () => ICoords[],
 }
 
-// interface ShipConstructorParams {
-//   position: ICoords,
-//   direction: boolean,
-//   length: number,
-//   hittings?: ICoords[],
-// }
-
 export class Ship implements IShip {
   position: ICoords
   direction: boolean

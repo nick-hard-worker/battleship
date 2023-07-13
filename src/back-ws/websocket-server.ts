@@ -6,6 +6,8 @@ import { addShips } from './request-handlers/ships-handler.js';
 import { attack } from './request-handlers/attack-handler.js';
 import { wsServer } from '../../index.js';
 import { gameRepository, roomRepository, userRepository } from './db/db.js';
+import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './responses/msgs.js';
+import { Game } from './db/models/games.js';
 
 export interface ExtendedWebSocket extends WebSocket {
   id: string;
@@ -63,17 +65,23 @@ export const startWebSocketServer = (port: number) => {
       const rooms = roomRepository
         .getAll()
         .filter(room => room.roomUsers.some(user => user.index === disconnectedUser?.id));
-      console.log(rooms);
       rooms.forEach(room => roomRepository.delete(room.id as number));
-      console.log(roomRepository.getAll());
+      wsSendUpdateRoom();
 
       // delete existing games with user
       const games = gameRepository
         .getAll()
         .filter(game => game.players.some(user => user.userId === disconnectedUser?.id));
-      console.log(games);
-      games.forEach(game => gameRepository.delete(game.id as number));
-      console.log(gameRepository.getAll());
+      games.forEach(game => {
+        const deletedGame = new Game(game);
+        const dataFinish = {
+          winPlayer: 99999,
+        };
+        const finishResponse = formResponse(ResType.finish, dataFinish);
+        sendMsgsByWsID(deletedGame.getWsIds(), finishResponse);
+
+        gameRepository.delete(deletedGame.id as number);
+      });
     });
   });
   return wsServer;

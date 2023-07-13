@@ -58,7 +58,7 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
     return;
   }
 
-  const dataMissOrShot = { //   ?????????????????
+  const dataMissOrShot = {
     position: attackCoords,
     currentPlayer: data.indexPlayer, /* id of the player in the current game */
     status: shotResult,
