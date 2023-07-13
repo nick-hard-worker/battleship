@@ -8,11 +8,21 @@ export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number)
   let connectedUser: IUser;
   const foundUser = userRepository.getByName(data.name);
   if (foundUser) {
-    // check password
+    if (foundUser.password !== data.password) {
+      const dataErrPswd = {
+        name: foundUser.name,
+        index: foundUser.id,
+        error: true,
+        errorText: 'Incorrect password',
+      }
+      const responseErrPswd = formResponse(ResType.reg, dataErrPswd)
+      sendMsgsByWsID(ws.id, responseErrPswd)
+      return
+    }
+
     connectedUser = userRepository.update({ ...foundUser, wsId: ws.id }) as IUser;
   }
   else connectedUser = userRepository.add({ ...data, wsId: ws.id, wins: 0 });
-  console.log(connectedUser);
 
   const dataResponse = {
     name: connectedUser.name,
