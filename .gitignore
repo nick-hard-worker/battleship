@@ -17,3 +17,6 @@ npm-debug.log
 
 # environment
 .env
+
+# typescript build
+dist/
