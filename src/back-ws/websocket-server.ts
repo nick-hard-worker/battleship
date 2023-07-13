@@ -4,7 +4,6 @@ import { handleRegistration } from './request-handlers/reg-handler.js';
 import { createRoom, addUserToRoom } from './request-handlers/room-handler.js';
 import { addShips } from './request-handlers/ships-handler.js';
 import { attack } from './request-handlers/attack-handler.js';
-import { wsServer } from '../../index.js';
 import { gameRepository, roomRepository, userRepository } from './db/db.js';
 import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './responses/msgs.js';
 import { Game } from './db/models/games.js';
@@ -85,8 +84,6 @@ export const startWebSocketServer = (port: number) => {
     });
   });
   return wsServer;
-
-
 };
 
 function isMessageHandler(type: any): type is IInputTypeMsg {

@@ -1,4 +1,4 @@
-import { wsServer } from '../../../index.js'
+import { wsServer } from '../../../index.js';
 import { roomRepository } from '../db/models/rooms.js';
 import { ExtendedWebSocket } from '../websocket-server.js';
 
@@ -24,17 +24,17 @@ export function formResponse(type: ResType, data: any): IMsg {
     type,
     data: JSON.stringify(data),
     id: 0
-  }
+  };
 }
 
 export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg: IMsg) {
-  console.log('RESPONSE: ', msg.type, JSON.parse(msg.data))
+  console.log('RESPONSE: ', msg.type, JSON.parse(msg.data));
   if (typeof destinationWsIds === 'string' &&
-    destinationWsIds !== 'all') { destinationWsIds = [destinationWsIds] }
+    destinationWsIds !== 'all') { destinationWsIds = [destinationWsIds]; }
 
   const allWsClients = [...wsServer.clients] as ExtendedWebSocket[];
   let responseList;
-  if (destinationWsIds === 'all') { responseList = allWsClients }
+  if (destinationWsIds === 'all') { responseList = allWsClients; }
   else {
     responseList = allWsClients.filter(client => destinationWsIds.includes(client.id));
   }
@@ -45,8 +45,8 @@ export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg:
 
 export function wsSendUpdateRoom() {
   const noFullRooms = roomRepository.getAll().filter(room => room.roomUsers.length < 2);
-  const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id } })
+  const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id }; });
 
   const response = formResponse(ResType.updateRoom, dataResponse);
-  sendMsgsByWsID('all', response)
+  sendMsgsByWsID('all', response);
 }
