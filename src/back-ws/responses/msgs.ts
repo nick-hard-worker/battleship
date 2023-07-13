@@ -28,6 +28,7 @@ export function formResponse(type: ResType, data: any): IMsg {
 }
 
 export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg: IMsg) {
+  console.log('RESPONSE: ', msg.type, JSON.parse(msg.data))
   if (typeof destinationWsIds === 'string' &&
     destinationWsIds !== 'all') { destinationWsIds = [destinationWsIds] }
 

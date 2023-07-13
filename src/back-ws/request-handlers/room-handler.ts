@@ -35,7 +35,7 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
   const roomForGame = roomRepository.getById(data.indexRoom) as IRoom;
 
-  // try to connect to pwn room:
+  // try to connect to self room:
   if (roomForGame && roomForGame.roomUsers[0].index === currentUser.id) return;
 
   // room already full
@@ -45,21 +45,22 @@ export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number) => {
     name: currentUser.name,
     index: currentUser.id
   })
+
   const firstUser = userRepository.getById(roomForGame.roomUsers[0].index) as IUser;
 
-  roomRepository.update(roomForGame);
-  let newGame = Game.initGame(firstUser.id, currentUser.id);
+  // roomRepository.update(roomForGame);
+  const newGame = Game.initGame(firstUser.id, currentUser.id);
   gameRepository.add(newGame);
 
   const dataToCurrentUser = {
-    idGame: firstUser.id,
+    idGame: newGame.gameId,
     idPlayer: currentUser.id
   }
   const responseToCurrent = formResponse(ResType.createGame, dataToCurrentUser);
-  ws.send(JSON.stringify(responseToCurrent))
+  sendMsgsByWsID(ws.id, responseToCurrent);
 
   const dataToFirst = {
-    idGame: firstUser.id,
+    idGame: newGame.gameId,
     idPlayer: firstUser.id
   }
   const responseToFirst = formResponse(ResType.createGame, dataToFirst)

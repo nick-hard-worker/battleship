@@ -4,42 +4,39 @@ import { ResType, formResponse, sendMsgsByWsID } from "../responses/msgs.js";
 import { ExtendedWebSocket } from "../websocket-server.js";
 
 export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
+  console.log('Start ATTACK handler: ', gameRepository.getAll())
   const gameData = gameRepository.getByGameId(data.gameId);
+  console.log('gameData ', gameData)
   if (!gameData) return;
   const currentGame = new Game(gameData);
+  console.log('currentGame ', currentGame)
   if (currentGame.activeUserId !== data.indexPlayer) return; // attacks from wrong player
 
   const attackCoords: ICoords = { x: data.x, y: data.y };
   const shotResult = currentGame.getAttackResult(attackCoords);
-  gameRepository.update(currentGame)
+  gameRepository.update(currentGame); // save hint
 
   if (shotResult === "killed") {
     const killedShipIndex = currentGame.getEnemyShipIndex(attackCoords);
     const killedShip = currentGame.getEnemyShips()[killedShipIndex]
     for (const coord of killedShip.hittings) { // mark as kill all points of ship
-      const attackResponse = {
-        type: "attack",
-        data: JSON.stringify({
-          position: coord,
-          currentPlayer: data.indexPlayer, /* id of the player in the current game */
-          status: shotResult,
-        }),
-        id,
+      const dataShot = {
+        position: coord,
+        currentPlayer: data.indexPlayer, /* id of the player in the current game */
+        status: shotResult,
       }
+      const attackResponse = formResponse(ResType.attack, dataShot);
       sendMsgsByWsID(currentGame.getWsIds(), attackResponse);
     }
 
     const aroundCoords = getAroundCoords(killedShip.allCoords());
     for (const coord of aroundCoords) {
-      const attackResponse = {
-        type: "attack",
-        data: JSON.stringify({
-          position: coord,
-          currentPlayer: data.indexPlayer, /* id of the player in the current game */
-          status: "miss",
-        }),
-        id,
+      const dataMiss = {
+        position: coord,
+        currentPlayer: data.indexPlayer, /* id of the player in the current game */
+        status: "miss",
       }
+      const attackResponse = formResponse(ResType.attack, dataMiss);
       sendMsgsByWsID(currentGame.getWsIds(), attackResponse);
     }
 
@@ -61,29 +58,25 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
     return;
   }
 
-  const attackResponse = {
-    type: "attack",
-    data: JSON.stringify({
-      position: attackCoords,
-      currentPlayer: data.indexPlayer, /* id of the player in the current game */
-      status: shotResult,
-    }),
-    id,
+  const dataMissOrShot = { //   ?????????????????
+    position: attackCoords,
+    currentPlayer: data.indexPlayer, /* id of the player in the current game */
+    status: shotResult,
   }
+  const attackResponse = formResponse(ResType.attack, dataMissOrShot)
   sendMsgsByWsID(currentGame.getWsIds(), attackResponse)
 
-  if (shotResult === "miss") {
+  if (shotResult === "miss") { // turn if miss
+    console.log('before changeActiveUser ', currentGame.activeUserId)
     currentGame.changeActiveUser();
+    console.log('after changeActiveUser ', currentGame.activeUserId)
     gameRepository.update(currentGame);
+    console.log('after changeActiveUser and update repo ', gameRepository.getAll())
 
-    const responseTurn =
-    {
-      type: 'turn',
-      data: JSON.stringify({
-        currentPlayer: currentGame.activeUserId,
-      }),
-      id: 0,
-    };
+    const dataTurnResponse = {
+      currentPlayer: currentGame.activeUserId,
+    }
+    const responseTurn = formResponse(ResType.turn, dataTurnResponse)
     sendMsgsByWsID(currentGame.getWsIds(), responseTurn);
   }
 }

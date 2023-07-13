@@ -1,7 +1,7 @@
 import { IUser, userRepository } from '../db/models/users.js';
 import { gameRepository } from '../db/models/games.js';
 import { Game, Ship } from '../db/models/games.js';
-import { sendMsgsByWsID } from '../responses/msgs.js';
+import { ResType, formResponse, sendMsgsByWsID } from '../responses/msgs.js';
 import { ExtendedWebSocket } from '../websocket-server.js'
 
 export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
@@ -23,37 +23,22 @@ export function addShips(ws: ExtendedWebSocket, data: any, id: number) {
   // two users in room:
   const secondPlayer = currentGame.players.find(player => player.userId !== playerId);
   const secondUser = userRepository.getById(secondPlayer?.userId as number) as IUser;
-  const responseCurrent = {
-    type: "start_game",
-    data: JSON.stringify(
-      {
-        ships:
-          [],
-        currentPlayerIndex: playerId
-      }),
-    id: 0
-  }
-  const responseSecond = {
-    type: "start_game",
-    data: JSON.stringify(
-      {
-        ships:
-          [],
-        currentPlayerIndex: secondUser.id
-      }),
-    id: 0
-  }
-  ws.send(JSON.stringify(responseCurrent))
-  sendMsgsByWsID(secondUser.wsId, responseSecond);
 
-  const responseTurn =
-  {
-    type: 'turn',
-    data: JSON.stringify({
-      currentPlayer: currentGame.activeUserId,
-    }),
-    id: 0,
-  };
+  const dataResponseToCurrent = {
+    ships: [],
+    currentPlayerIndex: playerId
+  }
+  const responseToCurrent = formResponse(ResType.startGame, dataResponseToCurrent);
+  sendMsgsByWsID(ws.id, responseToCurrent);
+
+  const dataResponseToSecond = {
+    ships: [],
+    currentPlayerIndex: secondUser.id
+  }
+  const responseToSecond = formResponse(ResType.startGame, dataResponseToSecond);
+  sendMsgsByWsID(secondUser.wsId, responseToSecond);
+
+  const dataTurn = { currentPlayer: currentGame.activeUserId }
+  const responseTurn = formResponse(ResType.turn, dataTurn);
   sendMsgsByWsID(currentGame.getWsIds(), responseTurn);
-
 }

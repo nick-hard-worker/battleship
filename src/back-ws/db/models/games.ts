@@ -14,12 +14,12 @@ interface IShip {
   allCoords: () => ICoords[],
 }
 
-interface ShipConstructorParams {
-  position: ICoords,
-  direction: boolean,
-  length: number,
-  hittings?: ICoords[],
-}
+// interface ShipConstructorParams {
+//   position: ICoords,
+//   direction: boolean,
+//   length: number,
+//   hittings?: ICoords[],
+// }
 
 export class Ship implements IShip {
   position: ICoords
@@ -54,29 +54,32 @@ interface IPlayer {
 type attackStatus = "miss" | "killed" | "shot";
 
 interface IGameConstructorParams {
+  id?: number;
   gameId: number;
   activeUserId: number;
   players: IPlayer[];
 }
 
-export interface IGame {
-  id: number,
-  gameId: number,
-  players: IPlayer[],
-  activeUserId: number,
+export interface IGame extends IGameConstructorParams {
+  // id?: number,
+  // gameId: number,
+  // players: IPlayer[],
+  // activeUserId: number,
   getAttackResult: (coord: ICoords) => attackStatus;
 }
 
 export class Game implements IGame {
-  id: number
+  id?: number
   gameId: number
   activeUserId: number
   players: IPlayer[]
 
-  constructor({ gameId, activeUserId, players }: IGameConstructorParams) {
-    this.id = this.gameId = gameId;
+  constructor({ id, gameId, activeUserId, players }: IGameConstructorParams) {
+    this.gameId = gameId;
     this.activeUserId = activeUserId;
     this.players = players;
+    console.log('constructor', id)
+    if (id !== undefined) { this.id = id; }
   }
 
   static initGame(id1: number, id2: number) {
@@ -98,8 +101,9 @@ export class Game implements IGame {
   }
 
   changeActiveUser() {
-    const nextPlayer = this.players.find(item => item.userId !== this.activeUserId);
-    this.activeUserId = nextPlayer?.userId as number;
+    const nextPlayer = this.players.find(item => item.userId !== this.activeUserId) as IPlayer;
+    console.log('change player to:', nextPlayer.userId)
+    this.activeUserId = nextPlayer.userId as number;
   }
 
   getWsIds() {

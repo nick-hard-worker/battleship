@@ -24,7 +24,7 @@ export class InMemoryRepository<T extends { id?: number }> {
   update(updatedEntity: T) {
     const index = this.entities.findIndex(entity => entity.id === updatedEntity.id);
     if (index !== -1) {
-      this.entities[index] = { ...updatedEntity };
+      this.entities[index] = updatedEntity;
       return this.entities[index];
     }
   }

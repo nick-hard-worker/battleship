@@ -21,7 +21,7 @@ export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number)
     errorText: '',
   }
   const responseReg = formResponse(ResType.reg, dataResponse)
-  ws.send(JSON.stringify(responseReg));
+  sendMsgsByWsID(ws.id, responseReg)
   wsSendUpdateRoom()
 
   const dataWinners = userRepository.getWinners();
