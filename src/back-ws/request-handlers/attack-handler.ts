@@ -4,12 +4,10 @@ import { ResType, formResponse, sendMsgsByWsID } from "../responses/msgs.js";
 import { ExtendedWebSocket } from "../websocket-server.js";
 
 export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
-  console.log('Start ATTACK handler: ', gameRepository.getAll())
   const gameData = gameRepository.getByGameId(data.gameId);
-  console.log('gameData ', gameData)
   if (!gameData) return;
+
   const currentGame = new Game(gameData);
-  console.log('currentGame ', currentGame)
   if (currentGame.activeUserId !== data.indexPlayer) return; // attacks from wrong player
 
   const attackCoords: ICoords = { x: data.x, y: data.y };
@@ -67,11 +65,8 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number) => {
   sendMsgsByWsID(currentGame.getWsIds(), attackResponse)
 
   if (shotResult === "miss") { // turn if miss
-    console.log('before changeActiveUser ', currentGame.activeUserId)
     currentGame.changeActiveUser();
-    console.log('after changeActiveUser ', currentGame.activeUserId)
     gameRepository.update(currentGame);
-    console.log('after changeActiveUser and update repo ', gameRepository.getAll())
 
     const dataTurnResponse = {
       currentPlayer: currentGame.activeUserId,

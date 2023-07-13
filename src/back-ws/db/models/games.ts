@@ -71,7 +71,6 @@ export class Game implements IGame {
     this.gameId = gameId;
     this.activeUserId = activeUserId;
     this.players = players;
-    console.log('constructor', id)
     if (id !== undefined) { this.id = id; }
   }
 
@@ -95,7 +94,6 @@ export class Game implements IGame {
 
   changeActiveUser() {
     const nextPlayer = this.players.find(item => item.userId !== this.activeUserId) as IPlayer;
-    console.log('change player to:', nextPlayer.userId)
     this.activeUserId = nextPlayer.userId as number;
   }
 

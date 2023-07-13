@@ -8,7 +8,6 @@ import { ExtendedWebSocket } from '../websocket-server.js'
 
 export function createRoom(ws: ExtendedWebSocket, data: any, id: number) {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
-  console.log(currentUser);
   if (isUserHaveRoom(currentUser.id)) return;
 
   roomRepository.add(

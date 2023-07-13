@@ -46,7 +46,6 @@ export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg:
 export function wsSendUpdateRoom() {
   const noFullRooms = roomRepository.getAll().filter(room => room.roomUsers.length < 2);
   const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id } })
-  // console.log(dataResponse)
 
   const response = formResponse(ResType.updateRoom, dataResponse);
   sendMsgsByWsID('all', response)
