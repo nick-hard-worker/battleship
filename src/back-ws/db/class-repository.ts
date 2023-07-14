@@ -7,7 +7,7 @@ export class InMemoryRepository<T extends { id?: number }> {
     this.nextId = 0;
   }
 
-  getAll() {
+  getAll(): T[] {
     return this.entities;
   }
 
@@ -21,7 +21,7 @@ export class InMemoryRepository<T extends { id?: number }> {
     return entityWithId;
   }
 
-  update(updatedEntity: T) {
+  update(updatedEntity: T): T | undefined {
     const index = this.entities.findIndex(entity => entity.id === updatedEntity.id);
     if (index !== -1) {
       this.entities[index] = updatedEntity;
@@ -29,11 +29,12 @@ export class InMemoryRepository<T extends { id?: number }> {
     }
   }
 
-  delete(id: number) {
+  delete(id: number): boolean {
     const index = this.entities.findIndex(entity => entity.id === id);
     if (index !== -1) {
       this.entities.splice(index, 1);
       return true;
     }
+    return false;
   }
 }

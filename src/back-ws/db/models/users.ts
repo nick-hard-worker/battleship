@@ -22,22 +22,18 @@ export interface IUser {
 // }
 
 class UserRepository extends InMemoryRepository<IUser> {
-  constructor() {
-    super();
-  }
-
-  getByName(name: string) {
+  getByName(name: string): IUser | undefined {
     return this.entities.find(user => user.name === name);
   }
 
-  getByWsId(wsId: string) {
+  getByWsId(wsId: string): IUser | undefined {
     return this.entities.find(user => user.wsId === wsId);
   }
 
-  getWinners() {
+  getWinners(): Array<{ name: string, wins: number }> {
     return this.getAll()
       .sort((a, b) => (b.wins - a.wins))
-      .map(({ name, wins }) => ({ name, wins }))
+      .map(({ name, wins }) => { return { name, wins }; });
   }
 }
 

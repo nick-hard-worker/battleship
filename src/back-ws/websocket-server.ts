@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { WebSocketServer, WebSocket } from 'ws';
+import { WebSocketServer, type WebSocket } from 'ws';
 import { handleRegistration } from './request-handlers/reg-handler.js';
 import { createRoom, addUserToRoom } from './request-handlers/room-handler.js';
 import { addShips } from './request-handlers/ships-handler.js';
@@ -11,7 +11,7 @@ import { Game } from './db/models/games.js';
 export interface ExtendedWebSocket extends WebSocket {
   id: string;
   isAlive: boolean;
-  heartbeat(ws: WebSocket): void;
+  heartbeat: (ws: WebSocket) => void;
 }
 
 type IInputTypeMsg = 'reg' | 'create_room' | 'add_user_to_room' | 'add_ships' | 'attack' | 'randomAttack';
@@ -22,24 +22,25 @@ const messageHandlers: Record<IInputTypeMsg, MessageHandler> = {
   create_room: createRoom,
   add_user_to_room: addUserToRoom,
   add_ships: addShips,
-  attack: attack,
+  attack,
   randomAttack: attack,
 };
 
-export const startWebSocketServer = (port: number) => {
+export const startWebSocketServer = (port: number): WebSocketServer => {
   const wsServer = new WebSocketServer({ port });
   console.log(`WebSocket server started on the ${port}`);
 
   wsServer.on('connection', (ws: ExtendedWebSocket) => {
     ws.heartbeat = function (this: ExtendedWebSocket) {
       this.isAlive = true;
-    }
+    };
     ws.id = randomUUID();
     ws.isAlive = true;
     ws.on('pong', ws.heartbeat);
     ws.on('error', console.error);
 
     ws.on('message', function message(msg) {
+      if (!(msg instanceof Buffer)) return;
       try {
         const parsedMessage = JSON.parse(msg.toString());
         let { type, data, id } = parsedMessage;
@@ -49,7 +50,7 @@ export const startWebSocketServer = (port: number) => {
         if (isMessageHandler(type)) {
           messageHandlers[type](ws, data, id);
         } else {
-          console.log(`No handler found for message type: ${type}`);
+          console.log(`No handler found for message type: ${type as string}`);
         }
       } catch (error) {
         console.error('Failed to parse incoming message:', error);
@@ -57,7 +58,7 @@ export const startWebSocketServer = (port: number) => {
     });
 
     ws.on('close', () => {
-      console.log(`client terminated ${ws.id}`)
+      console.log(`client terminated ${ws.id}`);
       const disconnectedUser = userRepository.getByWsId(ws.id);
 
       // delete existing rooms with user

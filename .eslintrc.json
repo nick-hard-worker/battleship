@@ -10,12 +10,12 @@
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module",
-         "project": "./tsconfig.json"
+        "project": "./tsconfig.json"
     },
     "plugins": [
         "prettier"
     ],
-     "rules": {
+    "rules": {
         "semi": [
             "error",
             "always",
@@ -40,7 +40,7 @@
         "space-before-function-paren": [
             "error",
             {
-                "anonymous": "never",
+                "anonymous": "always",
                 "named": "never",
                 "asyncArrow": "always"
             }

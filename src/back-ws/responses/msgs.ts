@@ -1,6 +1,6 @@
 import { wsServer } from '../../../index.js';
 import { roomRepository } from '../db/models/rooms.js';
-import { ExtendedWebSocket } from '../websocket-server.js';
+import { type ExtendedWebSocket } from '../websocket-server.js';
 
 export interface IMsg {
   type: string,
@@ -27,7 +27,7 @@ export function formResponse(type: ResType, data: any): IMsg {
   };
 }
 
-export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg: IMsg) {
+export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg: IMsg):void {
   console.log('RESPONSE: ', msg.type, JSON.parse(msg.data));
   if (typeof destinationWsIds === 'string' &&
     destinationWsIds !== 'all') { destinationWsIds = [destinationWsIds]; }
@@ -40,10 +40,10 @@ export function sendMsgsByWsID(destinationWsIds: string[] | string | 'all', msg:
   }
 
   const message = JSON.stringify(msg);
-  responseList.forEach(client => client.send(message));
-};
+  responseList.forEach(client => {client.send(message);});
+}
 
-export function wsSendUpdateRoom() {
+export function wsSendUpdateRoom():void {
   const noFullRooms = roomRepository.getAll().filter(room => room.roomUsers.length < 2);
   const dataResponse = noFullRooms.map(room => { return { ...room, roomId: room.id }; });
 

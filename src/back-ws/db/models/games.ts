@@ -15,28 +15,28 @@ interface IShip {
 }
 
 export class Ship implements IShip {
-  position: ICoords
-  direction: boolean
-  length: number
-  hittings: ICoords[]
+  position: ICoords;
+  direction: boolean;
+  length: number;
+  hittings: ICoords[];
 
   constructor({ position, direction, length, hittings }: IShip) {
     this.position = position;
     this.length = length;
     this.direction = direction;
-    this.hittings = hittings || [];
+    this.hittings = hittings ?? [];
   }
 
-  allCoords() {
+  allCoords(): ICoords[] {
     const coords = [] as ICoords[];
     const start = (this.direction) ? this.position.y : this.position.x;
     for (let i = start; i < start + this.length; i++) {
-      if (this.direction) coords.push({ x: this.position.x, y: i }) //vertical
-      else coords.push({ x: i, y: this.position.y }) // horizontal
+      if (this.direction) coords.push({ x: this.position.x, y: i }); // vertical
+      else coords.push({ x: i, y: this.position.y }); // horizontal
     }
 
     return coords;
-  };
+  }
 }
 
 interface IPlayer {
@@ -54,18 +54,14 @@ interface IGameConstructorParams {
 }
 
 export interface IGame extends IGameConstructorParams {
-  // id?: number,
-  // gameId: number,
-  // players: IPlayer[],
-  // activeUserId: number,
   getAttackResult: (coord: ICoords) => attackStatus;
 }
 
 export class Game implements IGame {
-  id?: number
-  gameId: number
-  activeUserId: number
-  players: IPlayer[]
+  id?: number;
+  gameId: number;
+  activeUserId: number;
+  players: IPlayer[];
 
   constructor({ id, gameId, activeUserId, players }: IGameConstructorParams) {
     this.gameId = gameId;
@@ -74,7 +70,7 @@ export class Game implements IGame {
     if (id !== undefined) { this.id = id; }
   }
 
-  static initGame(id1: number, id2: number) {
+  static initGame(id1: number, id2: number): Game {
     const game = {
       gameId: id1,
       activeUserId: id1,
@@ -88,61 +84,58 @@ export class Game implements IGame {
           ships: []
         }
       ]
-    }
-    return new Game(game)
+    };
+    return new Game(game);
   }
 
-  changeActiveUser() {
+  changeActiveUser(): void {
     const nextPlayer = this.players.find(item => item.userId !== this.activeUserId) as IPlayer;
-    this.activeUserId = nextPlayer.userId as number;
+    this.activeUserId = nextPlayer.userId;
   }
 
-  getWsIds() {
+  getWsIds(): string[] {
     return this.players
       .map(item => item.userId)
       .map(userId => userRepository.getById(userId)?.wsId) as string[];
   }
 
   getAttackResult(attackCoords: ICoords): attackStatus {
-    const enemyShips = this.getEnemyShips()
+    const enemyShips = this.getEnemyShips();
     const shipIndex = this.getEnemyShipIndex(attackCoords);
-    if (shipIndex === -1) return "miss"
+    if (shipIndex === -1) return "miss";
 
     if (!isAlreadyShot(enemyShips[shipIndex], attackCoords)) {
       enemyShips[shipIndex].hittings.push(attackCoords);
     }
-    if (enemyShips[shipIndex].hittings.length === enemyShips[shipIndex].allCoords().length) return "killed"
-    return "shot"
+    if (enemyShips[shipIndex].hittings.length === enemyShips[shipIndex].allCoords().length) return "killed";
+    return "shot";
 
     function isAlreadyShot(ship: Ship, coord: ICoords): boolean {
-      return enemyShips[shipIndex].hittings.some((coord) => coord.x === attackCoords.x && coord.y === attackCoords.y)
+      return enemyShips[shipIndex].hittings.some((coord) => coord.x === attackCoords.x && coord.y === attackCoords.y);
     }
   }
 
-  getEnemyShips() {
+  getEnemyShips(): Ship[] {
     const enemyPlayer = this.players.filter(player => player.userId !== this.activeUserId)[0];
-    return enemyPlayer.ships.map(item => (new Ship(item)))
+    return enemyPlayer.ships.map(item => (new Ship(item)));
   }
-  getEnemyShipIndex(attackCoords: ICoords) {
+
+  getEnemyShipIndex(attackCoords: ICoords): number {
     const enemyPlayer = this.players.filter(player => player.userId !== this.activeUserId)[0];
-    const enemyShips = enemyPlayer.ships.map(item => (new Ship(item)))
+    const enemyShips = enemyPlayer.ships.map(item => (new Ship(item)));
     const shipIndex = enemyShips.findIndex(ship => ship.allCoords().some(
-      (item) => item.x === attackCoords.x && item.y === attackCoords.y))
-    return shipIndex
+      (item) => item.x === attackCoords.x && item.y === attackCoords.y));
+    return shipIndex;
   }
 
   isEndGame(): boolean {
     const enemyShips = this.getEnemyShips();
-    return enemyShips.every(ship => ship.allCoords().length === ship.hittings.length)
+    return enemyShips.every(ship => ship.allCoords().length === ship.hittings.length);
   }
 }
 
 class GameRepository extends InMemoryRepository<IGame> {
-  constructor() {
-    super();
-  }
-
-  getByGameId(id: number) {
+  getByGameId(id: number): IGame | undefined {
     return this.entities.find(game => game.gameId === id);
   }
 }
