@@ -6,7 +6,7 @@ import { type ExtendedWebSocket } from '../websocket-server.js';
 
 // 2 actions for room: createRoom, addUserToRoom:
 
-export function createRoom(ws: ExtendedWebSocket, data: any, id: number):void {
+export function createRoom(ws: ExtendedWebSocket, data: any): void {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
   if (isUserHaveRoom(currentUser.id)) return;
 
@@ -23,7 +23,7 @@ export function createRoom(ws: ExtendedWebSocket, data: any, id: number):void {
   wsSendUpdateRoom();
 }
 
-function isUserHaveRoom(userId: number):boolean {
+function isUserHaveRoom(userId: number): boolean {
   const findIndex = roomRepository
     .getAll()
     .findIndex(room => room.roomUsers.some(user => user.index === userId));
@@ -31,7 +31,7 @@ function isUserHaveRoom(userId: number):boolean {
   return true;
 }
 
-export const addUserToRoom = (ws: ExtendedWebSocket, data: any, id: number):void => {
+export const addUserToRoom = (ws: ExtendedWebSocket, data: any): void => {
   const currentUser = userRepository.getByWsId(ws.id) as IUser;
   const roomForGame = roomRepository.getById(data.indexRoom) as IRoom;
 

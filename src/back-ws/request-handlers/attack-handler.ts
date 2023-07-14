@@ -1,9 +1,9 @@
 import { type ICoords, Game, gameRepository } from "../db/models/games.js";
 import { type IUser, userRepository } from "../db/models/users.js";
-import { ResType, formResponse, sendMsgsByWsID } from "../responses/msgs.js";
-import {type  ExtendedWebSocket } from "../websocket-server.js";
+import { ResType, formResponse, sendMsgsByWsID, wsSendTurn } from "../responses/msgs.js";
+import { type ExtendedWebSocket } from "../websocket-server.js";
 
-export const attack = (ws: ExtendedWebSocket, data: any, id: number):void => {
+export const attack = (ws: ExtendedWebSocket, data: any): void => {
   const gameData = gameRepository.getByGameId(data.gameId);
   if (gameData == null) return;
 
@@ -38,6 +38,8 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number):void => {
       sendMsgsByWsID(currentGame.getWsIds(), attackResponse);
     }
 
+    wsSendTurn(currentGame);
+
     if (currentGame.isEndGame()) {
       // update winners
       const currentUser = userRepository.getById(currentGame.activeUserId) as IUser;
@@ -67,14 +69,18 @@ export const attack = (ws: ExtendedWebSocket, data: any, id: number):void => {
   if (shotResult === "miss") { // turn if miss
     currentGame.changeActiveUser();
     gameRepository.update(currentGame);
-
-    const dataTurnResponse = {
-      currentPlayer: currentGame.activeUserId,
-    };
-    const responseTurn = formResponse(ResType.turn, dataTurnResponse);
-    sendMsgsByWsID(currentGame.getWsIds(), responseTurn);
   }
+  wsSendTurn(currentGame);
 };
+
+export const randomAttack = (ws: ExtendedWebSocket, data: any): void => {
+  data = { ...data, x: getRandomInteger(), y: getRandomInteger() };
+  attack(ws, data);
+};
+
+function getRandomInteger(): number {
+  return Math.floor(Math.random() * 10);
+}
 
 function getAroundCoords(shipCoords: ICoords[]): ICoords[] {
   const pointsArr: ICoords[] = [];

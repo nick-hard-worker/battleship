@@ -3,7 +3,7 @@ import { gameRepository, Game, Ship } from '../db/models/games.js';
 import { ResType, formResponse, sendMsgsByWsID } from '../responses/msgs.js';
 import { type ExtendedWebSocket } from '../websocket-server.js';
 
-export function addShips(ws: ExtendedWebSocket, data: any, id: number): void {
+export function addShips(ws: ExtendedWebSocket, data: any): void {
   const gameData = gameRepository.getByGameId(data.gameId);
   if (gameData === undefined) return;
 

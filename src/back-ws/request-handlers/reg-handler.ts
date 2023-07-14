@@ -3,7 +3,7 @@ import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from '../resp
 import { type ExtendedWebSocket } from '../websocket-server.js';
 
 // type "reg" handler:
-export function handleRegistration(ws: ExtendedWebSocket, data: any, id: number):void {
+export function handleRegistration(ws: ExtendedWebSocket, data: any): void {
   let connectedUser: IUser;
   const foundUser = userRepository.getByName(data.name);
   if (foundUser != null) {

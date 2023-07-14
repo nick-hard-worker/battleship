@@ -3,7 +3,7 @@ import { WebSocketServer, type WebSocket } from 'ws';
 import { handleRegistration } from './request-handlers/reg-handler.js';
 import { createRoom, addUserToRoom } from './request-handlers/room-handler.js';
 import { addShips } from './request-handlers/ships-handler.js';
-import { attack } from './request-handlers/attack-handler.js';
+import { attack, randomAttack } from './request-handlers/attack-handler.js';
 import { gameRepository, roomRepository, userRepository } from './db/db.js';
 import { ResType, formResponse, sendMsgsByWsID, wsSendUpdateRoom } from './responses/msgs.js';
 import { Game } from './db/models/games.js';
@@ -15,7 +15,7 @@ export interface ExtendedWebSocket extends WebSocket {
 }
 
 type IInputTypeMsg = 'reg' | 'create_room' | 'add_user_to_room' | 'add_ships' | 'attack' | 'randomAttack';
-type MessageHandler = (ws: ExtendedWebSocket, data: any, id: number) => void;
+type MessageHandler = (ws: ExtendedWebSocket, data: any) => void;
 
 const messageHandlers: Record<IInputTypeMsg, MessageHandler> = {
   reg: handleRegistration,
@@ -23,7 +23,7 @@ const messageHandlers: Record<IInputTypeMsg, MessageHandler> = {
   add_user_to_room: addUserToRoom,
   add_ships: addShips,
   attack,
-  randomAttack: attack,
+  randomAttack
 };
 
 export const startWebSocketServer = (port: number): WebSocketServer => {
@@ -43,12 +43,12 @@ export const startWebSocketServer = (port: number): WebSocketServer => {
       if (!(msg instanceof Buffer)) return;
       try {
         const parsedMessage = JSON.parse(msg.toString());
-        let { type, data, id } = parsedMessage;
+        let { type, data } = parsedMessage;
         console.log(parsedMessage);
         if (data.length > 0) data = JSON.parse(data); // feature on the frontend side
 
         if (isMessageHandler(type)) {
-          messageHandlers[type](ws, data, id);
+          messageHandlers[type](ws, data);
         } else {
           console.log(`No handler found for message type: ${type as string}`);
         }
